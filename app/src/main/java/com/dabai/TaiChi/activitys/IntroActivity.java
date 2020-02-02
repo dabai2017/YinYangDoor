@@ -4,7 +4,6 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -13,21 +12,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dabai.TaiChi.R;
-import com.github.paolorotolo.appintro.AppIntro;
+import com.github.paolorotolo.appintro.AppIntro2;
 import com.github.paolorotolo.appintro.AppIntroFragment;
-import com.github.paolorotolo.appintro.AppIntroViewPager;
 import com.github.paolorotolo.appintro.model.SliderPage;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class IntroActivity extends AppIntro {
+public class IntroActivity extends AppIntro2 {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
 
-       getSupportActionBar().hide();
+        getSupportActionBar().hide();
 
         //dark
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -40,16 +38,13 @@ public class IntroActivity extends AppIntro {
         addPage("权限提示", "我在APP中申请了网络权限，用来帮助我收集错误信息。这完全是匿名的，你不用担心泄露隐私。");
         addPage("权限提示", "我在APP中申请了网络权限，用来帮助我收集错误信息。这完全是匿名的，你不用担心泄露隐私。");
         addPage("权限提示", "我在APP中申请了网络权限，用来帮助我收集错误信息。这完全是匿名的，你不用担心泄露隐私。");
-        addPage("权限提示", "我在APP中申请了网络权限，用来帮助我收集错误信息。这完全是匿名的，你不用担心泄露隐私。");
-        addPage("权限提示", "我在APP中申请了网络权限，用来帮助我收集错误信息。这完全是匿名的，你不用担心泄露隐私。");
 
 
-
-        setBarColor(Color.parseColor("#000000"));
-        setSeparatorColor(Color.parseColor("#ffffff"));
+        setBarColor(Color.parseColor("#f6f6f6"));
 
         setFlowAnimation();
 
+        setIndicatorColor(Color.BLACK, Color.BLACK);
 
         showSkipButton(false);
 
@@ -83,7 +78,6 @@ public class IntroActivity extends AppIntro {
     @Override
     public void onSlideChanged(@Nullable Fragment oldFragment, @Nullable Fragment newFragment) {
         super.onSlideChanged(oldFragment, newFragment);
-
 
 
     }
