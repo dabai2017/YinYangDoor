@@ -190,7 +190,8 @@ public class SettingsActivity extends AppCompatActivity {
                     .title("选择一个工作模式")
                     .positiveText("确认")
                     .neutralText("取消")
-                    .items(new String[]{"ROOT", "Shizuku", "设备管理员"})
+                    //暂时 取消了设备管理员模式
+                    .items(new String[]{"ROOT", "Shizuku"})
                     .itemsCallbackSingleChoice(index, new MaterialDialog.ListCallbackSingleChoice() {
                         @Override
                         public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
@@ -202,7 +203,11 @@ public class SettingsActivity extends AppCompatActivity {
                                     set_SharedPreferences("mode", "shizuku");
                                     break;
                                 case 2:
-                                    set_SharedPreferences("mode", "admin");
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        set_SharedPreferences("mode", "admin");
+                                    }else {
+                                        Toast.makeText(context, "当前Android版本不支持设备管理员模式!", Toast.LENGTH_SHORT).show();
+                                    }
                                     break;
                             }
 

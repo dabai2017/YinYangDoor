@@ -11,16 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activitys.EggActivity"></activity>
         <activity
             android:name=".activitys.SettingsActivity"
-            android:label="设置"
-           />
+            android:label="设置" />
         <activity
-            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
             android:name=".activitys.FeedBack"
             android:label="反馈"
-            />
-
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -30,7 +28,24 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity> <!-- 设备管理 begin -->
+        <receiver
+            android:name=".receiver.DeviceReceiver"
+            android:description="@string/description_admin"
+            android:label="阴阳门 - 设备管理员模式"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin" />
+
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+                <action android:name="android.app.action.DEVICE_ADMIN_DISABLE_REQUESTED" />
+                <action android:name="android.app.action.DEVICE_ADMIN_DISABLED" />
+
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

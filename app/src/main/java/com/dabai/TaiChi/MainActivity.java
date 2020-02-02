@@ -2,10 +2,13 @@ package com.dabai.TaiChi;
 
 import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.AssetManager;
@@ -44,6 +47,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.dabai.TaiChi.activitys.EggActivity;
 import com.dabai.TaiChi.activitys.SettingsActivity;
 import com.dabai.TaiChi.utils.AppInfo;
 import com.dabai.TaiChi.utils.Fruit;
@@ -55,6 +59,8 @@ import com.google.android.material.tabs.TabLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,21 +96,20 @@ public class MainActivity extends AppCompatActivity {
 
     MaterialDialog pd;
 
-    TextView te1, te2;
+    TextView te1;
 
     private Context context;
     private String TAG = "dabaizzz";
 
 
-    private List fruitList, fruitList2, fruitList3;
-    private RecyclerView recyclerView1, recyclerView2, recyclerView3;
-    private GridLayoutManager layoutManager, layoutManager2, layoutManager3;
-    private int apps2num, apps3num;
+    private List fruitList, fruitList2;
+    private RecyclerView recyclerView1, recyclerView2;
+    private GridLayoutManager layoutManager, layoutManager2;
+    private int apps2num;
     private Animation animation;
     private boolean ispanduan = true;
     private float mpositionOffset;
     private View page1view, page2view;
-
 
     LinearLayout errlay1;
     ImageView errorimg1;
@@ -122,12 +127,12 @@ public class MainActivity extends AppCompatActivity {
         context = getApplicationContext();
         getSupportActionBar().setElevation(0);
 
-        sp = this.getSharedPreferences("com.dabai.TaiChi_preferences", 0);
 
         //dark
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         }
+        sp = this.getSharedPreferences("com.dabai.TaiChi_preferences", 0);
 
         is_pass();
 
@@ -142,13 +147,14 @@ public class MainActivity extends AppCompatActivity {
 
         fruitList = new ArrayList<>();
         fruitList2 = new ArrayList<>();
-        fruitList3 = new ArrayList<>();
 
         init();
         first_checkmode();
 
 
     }
+
+
 
     /**
      * 第一次 打开 检查 工作模式
@@ -169,20 +175,26 @@ public class MainActivity extends AppCompatActivity {
                             finish();
                         }
                     })
-                    .items(new String[]{"ROOT","Shizuku","设备管理员"})
+                    //暂时 取消了设备管理员模式
+                    .items(new String[]{"ROOT","Shizuku"})
                     .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
                         @Override
                         public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
                             switch (which){
                                 case 0:
-                                    Toast.makeText(context, "1", Toast.LENGTH_SHORT).show();
                                     set_SharedPreferences("mode","root");
                                     break;
                                 case 1:
                                     set_SharedPreferences("mode","shizuku");
                                     break;
                                 case 2:
-                                    set_SharedPreferences("mode","admin");
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        set_SharedPreferences("mode", "admin");
+                                    }else {
+                                        Toast.makeText(context, "当前Android版本不支持设备管理员模式!", Toast.LENGTH_SHORT).show();
+                                        set_SharedPreferences("mode","shizuku");
+                                    }
+
                                     break;
                             }
                             return true;
@@ -208,8 +220,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-
 
 
     @Override
@@ -307,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
 
             if (mpositionOffset > 0.3 && mpositionOffset < 0.7) {
-                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                startActivity(new Intent(MainActivity.this, EggActivity.class));
             }
 
             new Thread(new Runnable() {
@@ -347,7 +357,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         te1 = page2view.findViewById(R.id.textView1);
-        te2 = page2view.findViewById(R.id.textView2);
 
 
         viewlist.add(page1view);
@@ -414,11 +423,9 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView2 = page2view.findViewById(R.id.recy2);
         layoutManager2 = new GridLayoutManager(this, 4);
+
         recyclerView2.setLayoutManager(layoutManager2);
 
-        recyclerView3 = page2view.findViewById(R.id.recy3);
-        layoutManager3 = new GridLayoutManager(this, 4);
-        recyclerView3.setLayoutManager(layoutManager3);
 
         f5();
 
@@ -456,8 +463,9 @@ public class MainActivity extends AppCompatActivity {
                          * 刷新recy布局
                          */
 
-                        te1.setText("用户应用 - " + apps2num);
-                        te2.setText("系统应用 - " + apps3num);
+                        boolean setting_dsa = sp.getBoolean("setting_dsa",false);
+
+                        te1.setText((setting_dsa ? "全部":"用户")+"应用 - " + apps2num);
 
 
                         FruitAdapter adapter_f1 = new FruitAdapter(fruitList);
@@ -473,9 +481,6 @@ public class MainActivity extends AppCompatActivity {
                         FruitAdapter adapter_f2 = new FruitAdapter(fruitList2);
                         recyclerView2.setAdapter(adapter_f2);
 
-                        FruitAdapter adapter_f3 = new FruitAdapter(fruitList3);
-                        recyclerView3.setAdapter(adapter_f3);
-
                         pd.dismiss();
 
                     }
@@ -490,7 +495,6 @@ public class MainActivity extends AppCompatActivity {
 
         fruitList.clear();
         fruitList2.clear();
-        fruitList3.clear();
 
         List<ApplicationInfo> apps = queryFilterAppInfo();
         for (int i = 0; i < apps.size(); i++) {
@@ -509,16 +513,43 @@ public class MainActivity extends AppCompatActivity {
             fruitList2.add(apple);
         }
 
-        List<ApplicationInfo> apps3 = queryFilterAppInfo3();
-        for (int i = 0; i < apps3.size(); i++) {
-            String name = apps3.get(i).loadLabel(getPackageManager()).toString();
-            String apppackageName = apps3.get(i).packageName;
-            Fruit apple = new Fruit(name, AppInfo.getAppIconByPackageName(context, apppackageName));
-            fruitList3.add(apple);
-        }
-
         apps2num = apps2.size();
-        apps3num = apps3.size();
+
+    }
+
+    /**
+     * 按照时间排序;
+     * @param mList
+     */
+    private void sortData_time(List<ApplicationInfo> mList){
+
+        Collections.sort(mList, new Comparator<ApplicationInfo>() {
+            @Override
+            public int compare(ApplicationInfo lhs, ApplicationInfo rhs) {
+
+                PackageManager packageManager = getApplicationContext().getPackageManager();
+                PackageInfo packageInfo = null;
+                try {
+                    packageInfo = packageManager.getPackageInfo(lhs.packageName, 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                PackageInfo packageInfo2 = null;
+                try {
+                    packageInfo2 = packageManager.getPackageInfo(rhs.packageName, 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                long date1 = packageInfo.firstInstallTime;
+                long date2 = packageInfo2.firstInstallTime;
+                // 对时间字段进行降序
+                if (date1 < date2) {
+                    return 1;
+                }
+                return -1;
+            }
+        });
 
     }
 
@@ -528,6 +559,11 @@ public class MainActivity extends AppCompatActivity {
         // 查询所有已经安装的应用程序
         List<ApplicationInfo> appInfos = pm.getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);// GET_UNINSTALLED_PACKAGES代表已删除，但还有安装目录的
         List<ApplicationInfo> applicationInfos = new ArrayList<>();
+
+        //按照安装时间 排序
+        sortData_time(appInfos);
+        sortData_time(applicationInfos);
+
 
         // 创建一个类别为CATEGORY_LAUNCHER的该包名的Intent
         Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
@@ -556,44 +592,18 @@ public class MainActivity extends AppCompatActivity {
         return applicationInfos;
     }
 
-    //没冻结的用户app
+    //没冻结的用户app  & 没冻结的全部app
     private List<ApplicationInfo> queryFilterAppInfo2() {
         PackageManager pm = this.getPackageManager();
         // 查询所有已经安装的应用程序
         List<ApplicationInfo> appInfos = pm.getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);// GET_UNINSTALLED_PACKAGES代表已删除，但还有安装目录的
         List<ApplicationInfo> applicationInfos = new ArrayList<>();
 
-        // 创建一个类别为CATEGORY_LAUNCHER的该包名的Intent
-        Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
-        resolveIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
-        // 通过getPackageManager()的queryIntentActivities方法遍历,得到所有能打开的app的packageName
-        List<ResolveInfo> resolveinfoList = getPackageManager()
-                .queryIntentActivities(resolveIntent, 0);
-        Set<String> allowPackages = new HashSet();
-        for (ResolveInfo resolveInfo : resolveinfoList) {
-            allowPackages.add(resolveInfo.activityInfo.packageName);
-        }
+        //按照安装时间 排序
+        sortData_time(appInfos);
+        sortData_time(applicationInfos);
 
-        for (ApplicationInfo app : appInfos) {
-
-            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) <= 0)//通过flag排除系统应用，会将电话、短信也排除掉
-            {
-                if (app.enabled) {
-                    applicationInfos.add(app);
-                }
-            }
-
-        }
-        return applicationInfos;
-    }
-
-    //没冻结的系统app
-    private List<ApplicationInfo> queryFilterAppInfo3() {
-        PackageManager pm = this.getPackageManager();
-        // 查询所有已经安装的应用程序
-        List<ApplicationInfo> appInfos = pm.getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);// GET_UNINSTALLED_PACKAGES代表已删除，但还有安装目录的
-        List<ApplicationInfo> applicationInfos = new ArrayList<>();
 
         // 创建一个类别为CATEGORY_LAUNCHER的该包名的Intent
         Intent resolveIntent = new Intent(Intent.ACTION_MAIN, null);
@@ -607,16 +617,33 @@ public class MainActivity extends AppCompatActivity {
             allowPackages.add(resolveInfo.activityInfo.packageName);
         }
 
-        for (ApplicationInfo app : appInfos) {
+        boolean setting_dsa = sp.getBoolean("setting_dsa",false);
 
-            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) > 0)//通过flag排除系统应用，会将电话、短信也排除掉
-            {
-                if (app.enabled) {
-                    applicationInfos.add(app);
+        if (setting_dsa){
+
+            for (ApplicationInfo app : appInfos) {
+                if ((app.flags & ApplicationInfo.FLAG_SYSTEM) >= 0)//通过flag排除系统应用，会将电话、短信也排除掉
+                {
+                    if (app.enabled) {
+                        applicationInfos.add(app);
+                    }
+                }
+            }
+
+        }else {
+
+            for (ApplicationInfo app : appInfos) {
+                if ((app.flags & ApplicationInfo.FLAG_SYSTEM) <= 0)//通过flag排除系统应用，会将电话、短信也排除掉
+                {
+                    if (app.enabled) {
+                        applicationInfos.add(app);
+                    }
                 }
             }
 
         }
+
+
         return applicationInfos;
     }
 

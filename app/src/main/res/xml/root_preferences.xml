@@ -12,15 +12,28 @@
 
 
         <SwitchPreference
+            android:icon="@drawable/pass1"
             android:defaultValue="false"
             android:key="setting_pass"
             android:title="应用锁" />
+
+        <SwitchPreference
+            android:icon="@drawable/systemapp1"
+            android:defaultValue="false"
+            android:key="setting_dsa"
+            android:title="显示系统应用" />
+
+        <PreferenceScreen
+            android:icon="@drawable/listmode1"
+            android:summary="默认为安装时间从后往前"
+            android:title="排序方式"
+            android:enabled="false"
+            />
 
     </PreferenceCategory>
 
 
     <PreferenceCategory app:title="其他">
-
 
         <PreferenceScreen
             android:icon="@drawable/feed1"
@@ -33,15 +46,15 @@
             android:summary="可以捐赠一下咩?👻"
             android:title="捐赠"
             />
-        <PreferenceScreen
-            android:icon="@drawable/fx1"
-            android:key="other_share"
-            android:title="分享软件" />
 
         <PreferenceScreen
             android:icon="@drawable/update1"
             android:key="other_version"
             android:title="更新软件" />
+        <PreferenceScreen
+            android:icon="@drawable/fx1"
+            android:key="other_share"
+            android:title="分享软件" />
 
         <PreferenceScreen
             android:key="other_help"
