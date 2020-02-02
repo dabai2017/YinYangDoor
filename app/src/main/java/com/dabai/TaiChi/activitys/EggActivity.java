@@ -20,12 +20,25 @@ import com.dabai.TaiChi.R;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
+
+import sakura.particle.Factory.BooleanFactory;
+import sakura.particle.Factory.ExplodeParticleFactory;
+import sakura.particle.Factory.FallingParticleFactory;
+import sakura.particle.Factory.FlyawayFactory;
+import sakura.particle.Factory.InnerFallingParticleFactory;
+import sakura.particle.Factory.VerticalAscentFactory;
+import sakura.particle.Main.ExplosionSite;
 
 public class EggActivity extends AppCompatActivity {
 
     private Context context;
 
     ImageView img;
+
+    //爆炸特效
+    int ExplosionNum = 0;
+    private ExplosionSite explosionSite1,explosionSite2,explosionSite3,explosionSite4,explosionSite5,explosionSite6;
 
 
     @Override
@@ -66,27 +79,57 @@ public class EggActivity extends AppCompatActivity {
         img.setImageBitmap(bitmapimg);
 
 
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.img_animation2);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.img_animation);
         LinearInterpolator lin = new LinearInterpolator();//设置动画匀速运动
         animation.setInterpolator(lin);
         img.startAnimation(animation);
 
 
-        img.setOnTouchListener(new View.OnTouchListener() {
+        //目前提供了六种的粒子爆炸特效
+        explosionSite1 = new ExplosionSite(this, new BooleanFactory());
+        explosionSite2 = new ExplosionSite(this, new ExplodeParticleFactory());
+         explosionSite3 = new ExplosionSite(this, new FallingParticleFactory());
+         explosionSite4 = new ExplosionSite(this, new FlyawayFactory());
+         explosionSite5 = new ExplosionSite(this, new InnerFallingParticleFactory());
+         explosionSite6 = new ExplosionSite(this, new VerticalAscentFactory());
+
+
+        //爆炸激活方式一：将View或ViewGroup添加至雷管监听，View被点击时，触发爆炸
+        //explosionSite6.addListener(img);
+
+
+        img.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+            public void onClick(View view) {
 
-                img.setX(img.getX()+motionEvent.getX()-(img.getWidth()/2));
-                img.setY(img.getY()+motionEvent.getY()-(img.getHeight()/2));
+                switch (ExplosionNum % 6+1){
+                    case 1:
+                        explosionSite1.explode(img);
+                        break;
+                    case 2:
+                        explosionSite2.explode(img);
+                        break;
+                    case 3:
+                        explosionSite3.explode(img);
+                        break;
+                    case 4:
+                        explosionSite4.explode(img);
+                        break;
+                    case 5:
+                        explosionSite5.explode(img);
+                        break;
+                    case 6:
+                        explosionSite6.explode(img);
+                        break;
 
-                Animation animation = AnimationUtils.loadAnimation(context, R.anim.img_animation2);
-                LinearInterpolator lin = new LinearInterpolator();//设置动画匀速运动
-                animation.setInterpolator(lin);
-                img.startAnimation(animation);
 
-                return true;
+
+                }
+
+                ExplosionNum++;
             }
         });
+
 
 
 

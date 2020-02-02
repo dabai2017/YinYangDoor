@@ -2,8 +2,6 @@ package com.dabai.TaiChi;
 
 import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,9 +15,6 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,7 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
@@ -41,21 +35,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.dabai.TaiChi.activitys.EggActivity;
+import com.dabai.TaiChi.activitys.IntroActivity;
 import com.dabai.TaiChi.activitys.SettingsActivity;
 import com.dabai.TaiChi.utils.AppInfo;
+import com.dabai.TaiChi.utils.DabaiUtils;
+import com.dabai.TaiChi.utils.FileUtils;
 import com.dabai.TaiChi.utils.Fruit;
 import com.dabai.TaiChi.utils.FruitAdapter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -64,6 +59,9 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import sakura.particle.Factory.BooleanFactory;
+import sakura.particle.Main.ExplosionSite;
 
 
 /**
@@ -152,8 +150,8 @@ public class MainActivity extends AppCompatActivity {
         first_checkmode();
 
 
+        startActivity(new Intent(this, IntroActivity.class));
     }
-
 
 
     /**
@@ -163,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         // 0  root  shizuku  admin
         String mode = get_SharedPreferences("mode", "0");
 
-        if (mode.equals("0")){
+        if (mode.equals("0")) {
             new MaterialDialog.Builder(this)
                     .title("选择一个工作模式")
                     .cancelable(false)
@@ -176,23 +174,23 @@ public class MainActivity extends AppCompatActivity {
                         }
                     })
                     //暂时 取消了设备管理员模式
-                    .items(new String[]{"ROOT","Shizuku"})
+                    .items(new String[]{"ROOT", "Shizuku"})
                     .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
                         @Override
                         public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                            switch (which){
+                            switch (which) {
                                 case 0:
-                                    set_SharedPreferences("mode","root");
+                                    set_SharedPreferences("mode", "root");
                                     break;
                                 case 1:
-                                    set_SharedPreferences("mode","shizuku");
+                                    set_SharedPreferences("mode", "shizuku");
                                     break;
                                 case 2:
                                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                         set_SharedPreferences("mode", "admin");
-                                    }else {
+                                    } else {
                                         Toast.makeText(context, "当前Android版本不支持设备管理员模式!", Toast.LENGTH_SHORT).show();
-                                        set_SharedPreferences("mode","shizuku");
+                                        set_SharedPreferences("mode", "shizuku");
                                     }
 
                                     break;
@@ -209,9 +207,9 @@ public class MainActivity extends AppCompatActivity {
      */
     @SuppressLint("NewApi")
     private void is_pass() {
-        boolean setting_pass = sp.getBoolean("setting_pass",false);
+        boolean setting_pass = sp.getBoolean("setting_pass", false);
         //是否有应用锁
-        if (setting_pass){
+        if (setting_pass) {
             //P以下
             KeyguardManager km = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
             if (km.isKeyguardSecure()) {
@@ -355,6 +353,11 @@ public class MainActivity extends AppCompatActivity {
         Bitmap bitmap1 = getImageFromAssetsFile("guilian.png");
         errorimg1.setImageBitmap(bitmap1);
 
+        //目前提供了六种的粒子爆炸特效
+        ExplosionSite explosionSite1 = new ExplosionSite(this, new BooleanFactory());
+        //爆炸激活方式一：将View或ViewGroup添加至雷管监听，View被点击时，触发爆炸
+        explosionSite1.addListener(errlay1);
+
 
         te1 = page2view.findViewById(R.id.textView1);
 
@@ -436,7 +439,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     /**
      * 启动一个刷新所有数据的线程
      */
@@ -463,9 +465,9 @@ public class MainActivity extends AppCompatActivity {
                          * 刷新recy布局
                          */
 
-                        boolean setting_dsa = sp.getBoolean("setting_dsa",false);
+                        boolean setting_dsa = sp.getBoolean("setting_dsa", false);
 
-                        te1.setText((setting_dsa ? "全部":"用户")+"应用 - " + apps2num);
+                        te1.setText((setting_dsa ? "全部" : "用户") + "应用 - " + apps2num);
 
 
                         FruitAdapter adapter_f1 = new FruitAdapter(fruitList);
@@ -489,7 +491,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
-
 
     public void getApps() {
 
@@ -519,9 +520,10 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 按照时间排序;
+     *
      * @param mList
      */
-    private void sortData_time(List<ApplicationInfo> mList){
+    private void sortData_time(List<ApplicationInfo> mList) throws Exception{
 
         Collections.sort(mList, new Comparator<ApplicationInfo>() {
             @Override
@@ -560,9 +562,12 @@ public class MainActivity extends AppCompatActivity {
         List<ApplicationInfo> appInfos = pm.getInstalledApplications(PackageManager.GET_UNINSTALLED_PACKAGES);// GET_UNINSTALLED_PACKAGES代表已删除，但还有安装目录的
         List<ApplicationInfo> applicationInfos = new ArrayList<>();
 
-        //按照安装时间 排序
-        sortData_time(appInfos);
-        sortData_time(applicationInfos);
+        try {
+            //按照安装时间 排序
+            sortData_time(appInfos);
+            sortData_time(applicationInfos);
+        } catch (Exception e) {
+        }
 
 
         // 创建一个类别为CATEGORY_LAUNCHER的该包名的Intent
@@ -600,9 +605,12 @@ public class MainActivity extends AppCompatActivity {
         List<ApplicationInfo> applicationInfos = new ArrayList<>();
 
 
-        //按照安装时间 排序
-        sortData_time(appInfos);
-        sortData_time(applicationInfos);
+        try {
+            //按照安装时间 排序
+            sortData_time(appInfos);
+            sortData_time(applicationInfos);
+        } catch (Exception e) {
+        }
 
 
         // 创建一个类别为CATEGORY_LAUNCHER的该包名的Intent
@@ -617,9 +625,9 @@ public class MainActivity extends AppCompatActivity {
             allowPackages.add(resolveInfo.activityInfo.packageName);
         }
 
-        boolean setting_dsa = sp.getBoolean("setting_dsa",false);
+        boolean setting_dsa = sp.getBoolean("setting_dsa", false);
 
-        if (setting_dsa){
+        if (setting_dsa) {
 
             for (ApplicationInfo app : appInfos) {
                 if ((app.flags & ApplicationInfo.FLAG_SYSTEM) >= 0)//通过flag排除系统应用，会将电话、短信也排除掉
@@ -630,7 +638,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-        }else {
+        } else {
 
             for (ApplicationInfo app : appInfos) {
                 if ((app.flags & ApplicationInfo.FLAG_SYSTEM) <= 0)//通过flag排除系统应用，会将电话、短信也排除掉
@@ -650,24 +658,26 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 获取SharedPreferences数据
+     *
      * @param key
      * @return
      */
-    public String get_SharedPreferences(String key,String moren){
+    public String get_SharedPreferences(String key, String moren) {
         SharedPreferences sp = this.getSharedPreferences("data", 0);
         return sp.getString(key, moren);
     }
 
     /**
      * 设置SharedPreferences数据
+     *
      * @param key
      * @param value
      * @return
      */
-    public boolean set_SharedPreferences(String key,String value){
+    public boolean set_SharedPreferences(String key, String value) {
         SharedPreferences sp = this.getSharedPreferences("data", 0);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(key,value);
+        editor.putString(key, value);
         return editor.commit();
     }
 

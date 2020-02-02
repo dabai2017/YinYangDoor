@@ -44,7 +44,6 @@ public class SettingsActivity extends AppCompatActivity {
         context = getApplicationContext();
         getSupportActionBar().setElevation(0);
 
-
         //dark
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);

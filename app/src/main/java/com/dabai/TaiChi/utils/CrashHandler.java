@@ -1,6 +1,9 @@
 package com.dabai.TaiChi.utils;
 
+import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -8,6 +11,10 @@ import android.os.Environment;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.Toast;
+
+import com.dabai.TaiChi.MainActivity;
+import com.dabai.TaiChi.activitys.EggActivity;
+import com.dabai.TaiChi.activitys.SettingsActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +35,7 @@ import java.util.Map;
  * Created by 。 on 2018/12/5.
  */
 
-public class CrashHandler implements Thread.UncaughtExceptionHandler {
+public class CrashHandler extends Activity implements Thread.UncaughtExceptionHandler {
     private static CrashHandler sInstance = null;
     private Thread.UncaughtExceptionHandler mDefaultHandler;
     private Context mContext;
@@ -70,8 +77,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         if (!handleException(e)) {
             // 未经过人为处理,则调用系统默认处理异常,弹出系统强制关闭的对话框
             if (mDefaultHandler != null) {
-
-
                 mDefaultHandler.uncaughtException(t, e);
             }
         } else {
@@ -105,9 +110,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             @Override
             public void run() {
                 Looper.prepare();
+
                 Toast.makeText(mContext, "捕获到异常:" + eeeee, Toast.LENGTH_LONG).show();
 
-                if (Build.MODEL.equals("ONEPLUS A6000") && Build.VERSION.RELEASE.equals("8.1.0")){
+                if (Build.MODEL.equals("ONEPLUS A6000") && Build.VERSION.RELEASE.equals("8.1.0")) {
                     return;
                 }
 
@@ -117,8 +123,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                     public void run() {
                         try {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss EEE", Locale.CHINA);
-                            String titlem = "QRTools[来自:" + Build.MODEL + "的异常]";
-                            String textm = " **[时间：" +sdf.format(new Date())+ "]** **[版本：" + new DabaiUtils().getVersionName(mContext) + "]** **[android版本：" + Build.VERSION.RELEASE + "]**";
+                            String titlem = "阴阳门[来自:" + Build.MODEL + "的异常]";
+                            String textm = " **[时间：" + sdf.format(new Date()) + "]** **[版本：" + new DabaiUtils().getVersionName(mContext) + "]** **[android版本：" + Build.VERSION.RELEASE + "]**";
 
                             URL url = new URL("https://sc.ftqq.com/SCU35649Tec88ecad70ac8f2375a6c5a6e323c8425be9602402c5b.send?text=" + titlem + "&desp=" + eeeee + textm);
                             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -136,8 +142,8 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             }
         }.start();
 
-        collectErrorMessages();
-        saveErrorMessages(e);
+        //collectErrorMessages();
+        //saveErrorMessages(e);
         return false;
     }
 
@@ -178,8 +184,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
      */
 
 
-
-
     private void saveErrorMessages(Throwable e) {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : mMessage.entrySet()) {
@@ -188,7 +192,6 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             sb.append(key).append("=").append(value).append("\n");
         }
 
-
         Writer writer = new StringWriter();
         PrintWriter pw = new PrintWriter(writer);
         e.printStackTrace(pw);
@@ -196,10 +199,10 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
         String result = writer.toString();
         sb.append(result);
         String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(new Date());
-        String fileName = "crash-" + time + "-" + System.currentTimeMillis() + ".log";
+        String fileName = "yinyangDoor-" + time + "-" + System.currentTimeMillis() + ".log";
         // 有无SD卡
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            String path = Environment.getExternalStorageDirectory().getPath() + "/QRTcrash/";
+            String path = getFilesDir() + "/DBcrash/";
             File dir = new File(path);
             if (!dir.exists()) dir.mkdirs();
             FileOutputStream fos = null;
