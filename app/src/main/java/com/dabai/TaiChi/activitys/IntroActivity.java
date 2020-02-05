@@ -12,14 +12,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dabai.TaiChi.R;
-import com.github.paolorotolo.appintro.AppIntro2;
+import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 import com.github.paolorotolo.appintro.model.SliderPage;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class IntroActivity extends AppIntro2 {
+public class IntroActivity extends AppIntro {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,15 +36,17 @@ public class IntroActivity extends AppIntro2 {
         //page
         addPage("你好", "欢迎你使用我们的作品。");
         addPage("权限提示", "我在APP中申请了网络权限，用来帮助我收集错误信息。这完全是匿名的，你不用担心泄露隐私。");
-        addPage("权限提示", "我在APP中申请了网络权限，用来帮助我收集错误信息。这完全是匿名的，你不用担心泄露隐私。");
-        addPage("权限提示", "我在APP中申请了网络权限，用来帮助我收集错误信息。这完全是匿名的，你不用担心泄露隐私。");
+        addPage("工作模式", "你必须给APP选择一个工作模式，才能正常运行！");
 
 
-        setBarColor(Color.parseColor("#f6f6f6"));
+
+
+
+        setBarColor(Color.parseColor("#000000"));
 
         setFlowAnimation();
 
-        setIndicatorColor(Color.BLACK, Color.BLACK);
+        setIndicatorColor(Color.WHITE, Color.WHITE);
 
         showSkipButton(false);
 
@@ -62,6 +64,9 @@ public class IntroActivity extends AppIntro2 {
         sliderPage2.setBgColor(Color.parseColor("#f6f6f6"));
         addSlide(AppIntroFragment.newInstance(sliderPage2));
     }
+
+
+
 
     @Override
     public void onSkipPressed(Fragment currentFragment) {

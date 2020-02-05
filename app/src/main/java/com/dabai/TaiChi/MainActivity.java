@@ -15,16 +15,20 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -49,6 +53,10 @@ import com.dabai.TaiChi.utils.FileUtils;
 import com.dabai.TaiChi.utils.Fruit;
 import com.dabai.TaiChi.utils.FruitAdapter;
 import com.google.android.material.tabs.TabLayout;
+import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.DialogPlusBuilder;
+import com.orhanobut.dialogplus.OnItemClickListener;
+import com.orhanobut.dialogplus.ViewHolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -150,7 +158,8 @@ public class MainActivity extends AppCompatActivity {
         first_checkmode();
 
 
-        startActivity(new Intent(this, IntroActivity.class));
+        //startActivity(new Intent(this, IntroActivity.class));
+
     }
 
 
@@ -199,7 +208,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                     })
                     .show();
+
+
         }
+
     }
 
     /**
@@ -470,7 +482,8 @@ public class MainActivity extends AppCompatActivity {
                         te1.setText((setting_dsa ? "全部" : "用户") + "应用 - " + apps2num);
 
 
-                        FruitAdapter adapter_f1 = new FruitAdapter(fruitList);
+                        FruitAdapter adapter_f1 = new FruitAdapter(fruitList,context);
+
                         recyclerView1.setAdapter(adapter_f1);
 
                         if (fruitList.size() > 0) {
@@ -480,7 +493,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
 
-                        FruitAdapter adapter_f2 = new FruitAdapter(fruitList2);
+                        FruitAdapter adapter_f2 = new FruitAdapter(fruitList2,context);
                         recyclerView2.setAdapter(adapter_f2);
 
                         pd.dismiss();
@@ -581,7 +594,6 @@ public class MainActivity extends AppCompatActivity {
         for (ResolveInfo resolveInfo : resolveinfoList) {
             allowPackages.add(resolveInfo.activityInfo.packageName);
         }
-
 
         for (ApplicationInfo app : appInfos) {
 

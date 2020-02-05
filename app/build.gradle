@@ -41,4 +41,8 @@ dependencies {
     implementation 'com.github.zhaolei9527:Particle-master:v1.0.1'
     //app引导
     implementation 'com.github.AppIntro:AppIntro:5.1.0'
+
+    implementation 'com.orhanobut:dialogplus:1.11@aar'
+
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.0-beta11'
 }
