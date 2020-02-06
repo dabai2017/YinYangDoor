@@ -14,14 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.dabai.TaiChi.R;
 import com.orhanobut.dialogplus.DialogPlus;
+import com.orhanobut.dialogplus.ViewHolder;
 
 import java.util.List;
 
 public class FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHolder> {
     private List<Fruit> mFruitList;
-
-
-
 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -61,16 +59,26 @@ public class FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHolder> 
                 Fruit fruit = mFruitList.get(position);
 
 
-             }
+            }
         });
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         Fruit fruit = mFruitList.get(position);
         holder.fruitImage.setImageDrawable(fruit.getImage());
         holder.fruitName.setText(fruit.getName());
+
+        holder.fruitView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Toast.makeText(context, ""+position, Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
 
     }
 
@@ -85,16 +93,6 @@ public class FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHolder> 
         mFruitList = fruitList;
         this.context = context;
     }
-
-
-
-    public interface OnRecyItemClickListener{
-
-        void onClick(View view, int position);
-    }
-
-
-
 
 
 }
